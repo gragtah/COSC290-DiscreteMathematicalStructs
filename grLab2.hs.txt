@@ -1,0 +1,104 @@
+{- part 1
+
+Main» :type 'a'
+'a' :: Char
+Main» :type "cat"
+"cat" :: String  
+-}
+
+abc = "cat"
+
+{-
+Main» :type abc
+abc :: [Char]  
+
+This tells us that strings are lists of characters in Haskell
+
+-}
+
+
+
+
+
+
+-- part 2
+
+hd (x:list) = x
+tl (x:list) = list
+{-
+
+Main» :type hd
+hd :: [a] -» a
+Main» :type tl
+tl :: [a] -» [a]
+Main» hd [1,2,3]
+1
+Main» hd []
+
+Program error: pattern match failure: hd []
+
+Main» hd "stringvar"
+'s'
+Main» tl [1,2,3]
+[2,3]
+Main» tl []
+
+Program error: pattern match failure: tl []
+
+Main» tl "stringvar"
+"tringvar" 
+
+-}
+
+
+
+
+
+
+-- part 3
+
+mult1 (x,y) = x*y
+mult2 x y = x*y
+
+{-
+Main» :type mult1
+mult1 :: Num a =» (a,a) -» a
+Main» :type mult2
+mult2 :: Num a =» a -» a -» a
+-}
+
+
+
+
+
+--part4
+curry2  f a b = f(a,b)
+uncurry2 f(a,b) = f a b
+
+add1 (x,y) = x + y
+add2 x y = x + y
+
+{-
+Main» curry2 mult1 2 3
+6
+Main» uncurry2 mult2 (2,3)
+6  
+Main» curry2 add1 2 3
+5
+Main» uncurry2 add2 (2,3)
+5
+
+-}
+
+
+
+
+
+--part5 
+{- 
+We can have lists behave as sets through their behavior in regard to union, intersection and element addition operations. 
+The union operation can have function by creating a new list with elements from the first set, and the non-repeated elements from the second set. 
+Intersection can create a new list creating common elements from both lists. 
+And, addition of an element into a 'set' can work by checking if the element is already present (if so, just overwrite it/leave it unchanged); if not, just append to the list 
+This way, our lists can behave as sets for our purposes. 
+-}

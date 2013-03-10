@@ -1,0 +1,94 @@
+data SET a = E|Add(a, SET a) deriving (Eq, Ord, Read, Show)
+set1 = listToSet("abcd")
+set2 = listToSet ("cdef")
+set3 = listToSet[1,2,3,4]
+set4 = listToSet[5,6,7,8]
+set5 = listToSet[3,4]
+set6 = listToSet[4,3,3]
+
+setToList E = []
+setToList (Add(x, s)) = if (inS x s == False) then x: setToList s
+                        else (setToList s)
+
+listToSet [] = E                  
+listToSet (x:list) = addtoSet x (listToSet list)
+
+
+inS a E = False
+inS a (Add (x, s)) = if (a==x) then True
+                      else inS a s
+                     
+addtoSet a E = Add (a, E)                     
+addtoSet a  s = if (inS a s) then s
+               else (Add(a, s))
+union(E, t) = t
+union(Add(x,s), t) = if (inS x t == True) then union (s, t)
+                     else union (s, addtoSet x t)
+                     
+inter(E, t) = E
+inter(Add(x,s), t) = if (inS x t == True) then Add(x,inter(s, t))
+					 else inter(s, t)
+					 
+subSet(E, t) = True
+subSet(Add(x,s),t)	= if (inS x t == True) then	subSet(s, t)
+                      else False			 
+
+setEq(s, t) = if (subSet(s, t) == True && subSet(t, s)==True) then True
+             else False    					  
+
+{- setEq(s,t) is not the same as (s==t) because the former can be true and the latter false if 
+ the sets are {3,4} and {4,3} for example. s==t wont be true because the order of elements isn't 
+the same -}			 
+
+
+{-
+Testing Output :
+
+Main> set1
+Add ('a',Add ('b',Add ('c',Add ('d',E))))
+
+Main> set2
+Add ('c',Add ('d',Add ('e',Add ('f',E))))
+
+Main> set3
+Add (1,Add (2,Add (3,Add (4,E))))
+
+Main> set4
+Add (5,Add (6,Add (7,Add (8,E))))
+
+Main> set5
+Add (3,Add (4,E))
+
+Main> setToList set3
+[1,2,3,4]
+
+Main> setToList set1
+"abcd"
+
+Main> inS 'c' set2
+True
+
+Main> inS 'e' set1
+False
+
+Main> addtoSet 'e' set1
+Add ('e',Add ('a',Add ('b',Add ('c',Add ('d',E)))))
+
+Main> union(set1, set2)
+Add ('b',Add ('a',Add ('c',Add ('d',Add ('e',Add ('f',E))))))
+
+Main> union(set3, set4)
+Add (4,Add (3,Add (2,Add (1,Add (5,Add (6,Add (7,Add (8,E))))))))
+
+Main> inter(set1, set2)
+Add ('c',Add ('d',E))
+
+Main> subSet(set5,set3)
+True
+
+Main> setEq(set5,set6)
+True
+
+Main> setEq(set5,set4)
+False
+-}

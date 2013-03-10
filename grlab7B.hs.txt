@@ -1,0 +1,109 @@
+
+flatten []  =  []
+flatten (l:ls)  =  l ++ (flatten ls)
+
+comp (f1,f2) x = flatten(map f1 ( f2 x))
+
+
+relcomp 2 f1 = comp (f1,f1)
+relcomp n f1 = comp(f1,(relcomp (n-1) f1))
+
+inlist a [] = False
+inlist a (l:s) = if (a ==l) then True
+                 else (inlist a s)
+
+fixlist [] = []				 
+fixlist (l:s) = if (inlist l s == True) then fixlist s
+					else l:fixlist s 
+				 
+reflexrel q x = fixlist (x:(q x))
+
+trans2 1 rel x = rel x 
+trans2 n rel x = (relcomp n rel x)++(trans2 (n-1) rel x)
+
+transrel2 n rel x = fixlist ((relcomp n rel x)++(trans2 (n-1) rel x))
+
+
+
+rlist = [1,2,3,4]
+r rlist 1 = [2,4]
+r rlist 2 = [3]
+r rlist 3 = [4]
+r rlist 4 = []
+
+slist = [1,2,3,4]
+s slist 1 = [2]
+s slist 2 = [3,4]
+s slist 3 = []
+s slist 4 = []
+
+plist = [1,2,3,4]
+p plist 1 = [3]
+p plist 2 = [3]
+p plist 3 = [4]
+p plist 4 = []
+
+qlist = [1,2,3,4,5,6,7,8]
+q qlist 1 = [3]
+q qlist 2 = [4]
+q qlist 3 = [5]
+q qlist 4 = [6]
+q qlist 5 = [7]
+q qlist 6 = [7]
+q qlist 7 = [8]
+q qlist 8 = []
+
+
+transrelnew z zlist x = fixlist ((transrel2 (length(zlist)) (z zlist) x))
+reflexrelnew z zlist x = reflexrel (z zlist) x
+
+
+poset z zlist x = fixlist ((transrelnew z zlist x)++(reflexrelnew z zlist x))
+
+
+interlist [] l2 = []
+interlist (x:l1) l2 = if (inlist x l2 == True) then (x: interlist l1 l2)
+					  else interlist l1 l2
+					  
+					  
+------------------ LAB 7 B -------- (using above functions too)-----------
+
+upr r rlist a = poset r rlist a
+
+maxr r rlist (x:[]) =  [x]						
+maxr r rlist (x:list) = if (interlist (interlist (upr r rlist x)(x:list)) (maxr r rlist list)) == [] then (100:[])
+						else interlist (interlist (upr r rlist x)(x:list)) (maxr r rlist list)						
+						
+down r rlist a [] = []
+down r rlist a (x:list) = if (inlist a (poset r rlist x) == True) then x: (down r rlist a list)
+                          else down r rlist a list 
+
+downr r rlist a = down r rlist a rlist
+
+--helper function
+minn r rlist (x:[]) = downr r rlist x						
+minn r rlist (x:list) = if (interlist(downr r rlist x) (minn r rlist list) == []) then (-1:[])
+						else interlist (downr r rlist x)  (minn r rlist list)					
+
+minr r rlist (x:list) = if (interlist (minn r rlist (x:list)) (x:list) == [] ) then (-1:[])
+						else interlist (minn r rlist (x:list)) (x:list)
+
+						
+sup r rlist (a,b) = if (interlist (upr r rlist a) (upr r rlist b) == []) then (100:[])
+					else minr r rlist (interlist (upr r rlist a) (upr r rlist b))
+
+inf r rlist (a,b) = if (interlist (downr r rlist a) (downr r rlist b) == []) then (-1:[])
+					else maxr r rlist (interlist (downr r rlist a) (downr r rlist b))
+					
+
+posetsup r rlist (y:[]) = [y]					
+posetsup r rlist (x:y:list) = posetsup r rlist ((sup r rlist (x,y))++list) 			
+
+posetsup2 r rlist = posetsup r rlist rlist
+
+posetinf r rlist (y:[]) = [y]					
+posetinf r rlist (x:y:list) = posetinf r rlist ((inf r rlist (x,y))++list) 						
+	
+posetinf2 r rlist = posetinf r rlist rlist
+
+	
